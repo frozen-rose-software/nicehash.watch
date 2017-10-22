@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>NiceHash.Watch</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+</head>
+<body>
+    <div id="app">
+        <div class="jumbotron">
+            <h1 class="display-3">NiceHash.Watch</h1>
+            <p class="lead">Currently monitoring...</p>
+            <hr class="my-4">
+            <p>Workers: {{ .workers }}</p>
+        </div>
+
+        <div class="container">
+            <form method="POST" action="/shutdown">
+                <div class="form-group">
+                    <label for="password">Shutdown Password</label>
+                    <input id="password" type="password" class="form-control" v-model="password">
+                </div>
+                <button type="submit" class="btn btn-primary">Shutdown</button>
+
+                <div class="row small mt-3">
+                    <div class="col-md-2">Shutdown Key:</div>
+                    <div class="col-md-10"><small v-text="shutdownKey"></small></div>
+                </div>
+                <div class="row small">
+                    <div class="col-md-2">API Token:</div>
+                    <div class="col-md-10"><small v-text="token"></small></div>
+                </div>
+                <input type="hidden" name="api_token" :value="token">
+            </form>
+        </div>
+    </div>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.7.1/forge.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.0/axios.js"></script>
+    <script>
+var app = new Vue({
+    el: '#app',
+    data: {
+        password: "",
+        shutdownKey: ""
+    },
+    mounted: function() {
+        var self = this;
+
+        axios.get('/shutdown/key')
+            .then(function (response) {
+                self.shutdownKey = response.data.key;
+            }).catch(function (error) {
+                console.log(error);
+            });
+    },
+    computed: {
+        token: function() {
+            var hmac = forge.hmac.create();
+            hmac.start('sha256', this.password);
+            hmac.update(this.shutdownKey);
+            return hmac.digest().toHex();
+        }
+    }
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+twilio:
+  accountSid: ACxxxxx
+  authToken: xxxxx
+  fromNumber: "+15555555555"
+  toNumber: "+15555555556"
+niceHashAddr: xxxxx
+shutdownSecret: xxxxx
