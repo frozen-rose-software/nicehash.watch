@@ -91,7 +91,9 @@ func watch(done chan string) {
                 fmt.Println(err)
                 fmt.Printf("%+v\n", stats)
             } else {
-                if workers != -1 && workers != len(stats.Result.Workers) {
+                // Number of workers can change based on what is currently being mined
+                // For now, just let me know if we go to or from 0 workers.
+                if workers != -1 && workers != len(stats.Result.Workers) && (workers == 0 || len(stats.Result.Workers) == 0) {
                     fmt.Println("Found change, sending text.")
                     notify("NiceHash Workers: "+strconv.Itoa(len(stats.Result.Workers))+", was: "+strconv.Itoa(workers))
                 }
